@@ -3,14 +3,14 @@ import 'dart:io';
 import 'package:AoC_2019_Dart/Common.dart';
 
 void main(List<String> arguments) {
-  File('data/05_sunny_with_a_chance_of_asteroids.txt')
-      .readAsString()
-      .then((String contents) {
+  File('data/09_sensor_boost.txt').readAsString().then((String contents) {
     var instructions = contents.split(',').map(int.parse).toList();
-    print(diagnosticWithInput(instructions, [1]));
-    instructions = contents.split(',').map(int.parse).toList();
-    print(diagnosticWithInput(instructions, [5]));
+    print(testBOOSTprogram(instructions));
   });
+}
+
+int testBOOSTprogram(List<int> instructions) {
+  return diagnosticWithInput(instructions, [1])[0];
 }
 
 List<int> diagnosticWithInput(List<int> instructions, List<int> input) {

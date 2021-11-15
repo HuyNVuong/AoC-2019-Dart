@@ -1,13 +1,13 @@
-enum Opcode { add, multiply }
-
 class IntCode {
   List<int> instructions;
   List<int> output;
-  int input;
+  List<int> input;
+  int relativeBase;
 
-  IntCode(List<int> instructions, [input = 0]) {
+  IntCode(List<int> instructions, [input = null]) {
     this.instructions = instructions;
     this.input = input;
+    this.relativeBase = 0;
     output = <int>[];
   }
 
@@ -16,8 +16,10 @@ class IntCode {
     int getValue(int position, int mode) {
       if (mode == 0) {
         return instructions[instructions[position]];
-      } else {
+      } else if (mode == 1) {
         return instructions[position];
+      } else {
+        return instructions[instructions[position] + this.relativeBase];
       }
     }
 
@@ -38,7 +40,8 @@ class IntCode {
           i += 4;
         } else if (instruction == 3) {
           var address = instructions[i + 1];
-          instructions[address] = input;
+          instructions[address] = input[0];
+          input = input.sublist(1);
           i += 2;
         } else if (instruction == 4) {
           output.add(getValue(i + 1, firstParamMode));
@@ -69,12 +72,26 @@ class IntCode {
           var b = getValue(i + 2, secondParamMode);
           instructions[instructions[i + 3]] = a == b ? 1 : 0;
           i += 4;
+        } else if (instruction == 9) {
+          var a = getValue(i + 1, firstParamMode);
+          this.relativeBase += a;
+          i += 2;
         }
       } on Exception {
         return false;
       }
     }
     return true;
+  }
+}
+
+class LevelNode {
+  String key;
+  int level;
+
+  LevelNode(String key, int level) {
+    this.key = key;
+    this.level = level;
   }
 }
 
@@ -89,6 +106,17 @@ class Point {
 
   int manhattanDistance(Point other) {
     return (x - other.x).abs() + (y - other.y).abs();
+  }
+
+  Point slope(Point other) {
+    var dx = x - other.x;
+    var dy = y - other.y;
+    var gcd = dx.gcd(dy);
+    if (dx == 0 && dy == 0) {
+      return null;
+    } else {
+      return Point(dx ~/ gcd, dy ~/ gcd);
+    }
   }
 
   @override
